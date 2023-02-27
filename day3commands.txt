@@ -1,0 +1,369 @@
+
+ df.groupBy("designation").count().show
+
+
+c:\test\people.csv
+
+pcode,lastName,firstName,age
+02134,Hopper,Grace,52
+,Turing,Alan,32
+94020,Lovelace,Ada,28
+87501,Babbage,Charles,49
+02134,Wirth,Niklaus,48
+
+c:\test\postalcodes.csv
+
+pcode,city,state
+02134,Boston,MA
+94020,Palo Alto,CA
+87501,Santa Fe,NM
+60645,Chicago,IL
+
+val peopleDF=spark.read.format("csv").option("header",true).load("c:/test/people.csv")
+
+
+scala> peopleDF.show
+
+
+
+scala> val postalcodesDF=spark.read.format("csv").option("header",true).load("c:/test/postalcodes.csv")
+
+
+scala> val joinDF=peopleDF.join(postalcodesDF,"pcode")
+joinDF: org.apache.spark.sql.DataFrame = [pcode: string, lastName: string ... 4 more fields]
+
+scala> joinDF.show
+
+
+scala> peopleDF.join(postalcodesDF,peopleDF("pcode")===postalcodesDF("pcode"),"left_outer").show
+
+
+
+scala> peopleDF.join(postalcodesDF,peopleDF("pcode")===postalcodesDF("pcode"),"right_outer").show
+
+
+ peopleDF.join(postalcodesDF,peopleDF("pcode")===postalcodesDF("pcode"),"outer").show
+
+peopleDF.where($"pcode".isNotNull).show
+
+df.select(($"empid"*2).alias("new_id"),$"empname",$"designation").show
+
+scala> df.createTempView("emp")
+
+scala> spark.sql("select * from emp").show
+
+scala> spark.sql("select empid,empname from emp where designation='Developer'").show
+
+
+ <dependencies>
+  <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-streaming -->
+<dependency>
+    <groupId>org.apache.spark</groupId>
+    <artifactId>spark-streaming_2.12</artifactId>
+    <version>3.0.3</version>
+    
+</dependency>
+  
+  </dependencies>
+
+
+
+package com.jpmc.training.sparkstreams;
+
+import java.util.Arrays;
+
+import org.apache.spark.SparkConf;
+import org.apache.spark.streaming.Durations;
+import org.apache.spark.streaming.api.java.JavaDStream;
+import org.apache.spark.streaming.api.java.JavaStreamingContext;
+
+import scala.Tuple2;
+
+public class WordCountStreamTest {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		SparkConf conf=new SparkConf();
+		conf.setMaster("local[*]");
+		conf.setAppName("wordcount-stream-app");
+		JavaStreamingContext streamingContext=new JavaStreamingContext(conf,Durations.seconds(20));
+		JavaDStream<String> dStream=streamingContext.textFileStream("c:/teststream/test");
+		dStream.flatMap(line->Arrays.asList(line.split(" ")).iterator()).
+		mapToPair(word->new Tuple2<>(word, 1)).reduceByKey((x,y)->x+y).print();
+		streamingContext.start();
+		
+		System.out.println("streaming started");
+		
+		try {
+			streamingContext.awaitTermination();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+
+}
+
+
+https://archive.apache.org/dist/kafka/2.5.0/kafka_2.12-2.5.0.tgz
+
+
+
+<dependencies>
+  <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-streaming -->
+<dependency>
+    <groupId>org.apache.spark</groupId>
+    <artifactId>spark-streaming_2.12</artifactId>
+    <version>3.0.3</version>
+    
+</dependency>
+  <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-streaming-kafka-0-10 -->
+<dependency>
+    <groupId>org.apache.spark</groupId>
+    <artifactId>spark-streaming-kafka-0-10_2.12</artifactId>
+    <version>3.0.3</version>
+</dependency>
+  
+  </dependencies>
+
+bin\windows\zookeeper-server-start.bat config\zookeeper.properties
+
+
+bin\windows\kafka-server-start.bat config\server.properties
+
+bin\windows\kafka-topics --create --topic test-topic --partitions 4 --replication-factor 1 --zookeeper localhost:2181
+
+
+
+package com.jpmc.training.kafkastreams;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.common.serialization.StringDeserializer;
+import org.apache.spark.SparkConf;
+import org.apache.spark.streaming.Durations;
+import org.apache.spark.streaming.api.java.JavaInputDStream;
+import org.apache.spark.streaming.api.java.JavaStreamingContext;
+import org.apache.spark.streaming.kafka010.ConsumerStrategies;
+import org.apache.spark.streaming.kafka010.KafkaUtils;
+import org.apache.spark.streaming.kafka010.LocationStrategies;
+
+import scala.Tuple2;
+
+
+
+public class KafkaSparkStreamingApp {
+public static void main(String[] args) {
+	SparkConf conf=new SparkConf();
+	conf.setMaster("local[*]");
+	conf.setAppName("kafka-wordcount-stream-app");
+	JavaStreamingContext streamingContext=new JavaStreamingContext(conf,Durations.seconds(60));
+	streamingContext.sparkContext().setLogLevel("WARN");
+	
+	String topic="test-topic";
+	String kafkaUrl="localhost:9092";
+	
+	Map<String, Object> props=new HashMap<>();
+	props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaUrl);
+	props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+	props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+	props.put(ConsumerConfig.GROUP_ID_CONFIG,"group-1");
+	
+	Collection<String> topicList=Collections.singletonList(topic);
+	
+	JavaInputDStream<ConsumerRecord<String, String>> dStream=
+			KafkaUtils.createDirectStream(streamingContext, LocationStrategies.PreferConsistent(), 
+					ConsumerStrategies.Subscribe(topicList, props));
+	
+	dStream.mapToPair(msg->new Tuple2<>(msg.key(),msg.value())).map(t->t._2).
+			flatMap(line->Arrays.asList(line.split(" ")).iterator()).
+	mapToPair(word->new Tuple2<>(word, 1)).reduceByKey((x,y)->x+y).print();
+	streamingContext.start();
+	
+	System.out.println("streaming started");
+	
+	try {
+		streamingContext.awaitTermination();
+	} catch (InterruptedException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	
+	
+	
+}
+}
+
+
+bin\windows\kafka-console-producer --topic test-topic --bootstrap-server localhost:9092
+
+
+
+
+
+
+package com.jpmc.training.kafkastreams;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.common.serialization.StringDeserializer;
+import org.apache.spark.SparkConf;
+import org.apache.spark.streaming.Durations;
+import org.apache.spark.streaming.api.java.JavaInputDStream;
+import org.apache.spark.streaming.api.java.JavaStreamingContext;
+import org.apache.spark.streaming.kafka010.ConsumerStrategies;
+import org.apache.spark.streaming.kafka010.KafkaUtils;
+import org.apache.spark.streaming.kafka010.LocationStrategies;
+
+import scala.Tuple2;
+
+
+
+public class KafkaSparkStreamingApp {
+public static void main(String[] args) {
+	SparkConf conf=new SparkConf();
+	conf.setMaster("local[*]");
+	conf.setAppName("kafka-wordcount-stream-app");
+	JavaStreamingContext streamingContext=new JavaStreamingContext(conf,Durations.seconds(60));
+	streamingContext.sparkContext().setLogLevel("WARN");
+	
+	String topic="test-topic";
+	String kafkaUrl="localhost:9092";
+	
+	Map<String, Object> props=new HashMap<>();
+	props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaUrl);
+	props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+	props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+	props.put(ConsumerConfig.GROUP_ID_CONFIG,"group-1");
+	
+	Collection<String> topicList=Collections.singletonList(topic);
+	
+	JavaInputDStream<ConsumerRecord<String, String>> dStream=
+			KafkaUtils.createDirectStream(streamingContext, LocationStrategies.PreferConsistent(), 
+					ConsumerStrategies.Subscribe(topicList, props));
+	
+	dStream.mapToPair(msg->new Tuple2<>(msg.key(),msg.value())).map(t->t._2).
+			flatMap(line->Arrays.asList(line.split(" ")).iterator()).
+	mapToPair(word->new Tuple2<>(word, 1)).reduceByKey((x,y)->x+y)
+	.dstream().saveAsTextFiles("c:/wordcount/", "-fromkafka");
+	streamingContext.start();
+	
+	System.out.println("streaming started");
+	
+	try {
+		streamingContext.awaitTermination();
+	} catch (InterruptedException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	
+
+
+	
+	
+}
+}
+
+
+
+
+ <dependencies>
+  <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-sql -->
+<dependency>
+    <groupId>org.apache.spark</groupId>
+    <artifactId>spark-sql_2.12</artifactId>
+    <version>3.0.3</version>
+   </dependency>
+   </dependencies>
+
+
+
+package com.jpmc.training.structuredstreams;
+
+import org.apache.spark.sql.types.DataTypes;
+import org.apache.spark.sql.types.Metadata;
+import org.apache.spark.sql.types.StructField;
+import org.apache.spark.sql.types.StructType;
+
+public class StrucuredStreamingUtility {
+	public static StructType employeeSchema()
+	{
+		return new StructType(new StructField[] {
+			new StructField("id", DataTypes.IntegerType, false, Metadata.empty()),
+			new StructField("name", DataTypes.StringType, false, Metadata.empty()),
+			new StructField("designation", DataTypes.StringType, false, Metadata.empty())
+		});
+	}
+
+}
+
+
+c:\structuredstreams\csv\first.csv
+
+1001,Rajiv,Developer
+2322,Deva,Architect
+
+
+
+package com.jpmc.training.structuredstreams;
+
+import java.util.concurrent.TimeoutException;
+
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.streaming.StreamingQuery;
+import org.apache.spark.sql.streaming.StreamingQueryException;
+import org.apache.spark.sql.streaming.Trigger;
+
+public class StructuredStreamCSVTest {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		SparkSession spark=SparkSession.builder().appName("structured-csv-stream-app")
+                .master("local[*]").getOrCreate();
+
+		spark.sparkContext().setLogLevel("WARN");
+		String inputDirectory="C:/structuredstreams/csv";
+		Dataset<Row> df=spark.readStream().schema(StrucuredStreamingUtility.employeeSchema())
+				.csv(inputDirectory);
+		try {
+			StreamingQuery query=df.writeStream().trigger(Trigger.ProcessingTime("1 minute"))
+					.format("console").start();
+			System.out.println("streaming started");
+			query.awaitTermination();
+		} catch (TimeoutException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (StreamingQueryException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+
+	}
+
+}
+
+
+
+Create a structured streaming app which reads json files from directory c:/structuredstreams/json,
+polls at this source directory every 1 minute and writes them to the console.
+
+
+

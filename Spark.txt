@@ -1,0 +1,1069 @@
+spark-user13
+Password@1
+
+https://cloud.cdp.rpsconsulting.in/console/#
+
+https://notepad.pw/4xs9281x
+
+https://drive.google.com/drive/folders/1wAiJCMDJ5jgIXAraR65gLtIYh0SOuVoW?usp=sharing
+----------------------------------------------------------------------------------------------------
+Day 1:
+spark-shell
+
+val rdd1=sc.textFile("c:/test/sample.txt")
+
+rdd1.collect()
+
+scala> val rdd1=sc.textFile("c:/test")
+rdd1: org.apache.spark.rdd.RDD[String] = c:/test MapPartitionsRDD[3] at textFile at <console>:24
+
+scala> rdd1.collect()
+
+
+<dependencies>
+  <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-core -->
+<dependency>
+    <groupId>org.apache.spark</groupId>
+    <artifactId>spark-core_2.12</artifactId>
+    <version>3.0.3</version>
+</dependency>
+  
+  </dependencies>
+
+
+project: SparkCorePrj
+package: com.jpmc.training.sparkcore
+class: RDDCreationTest1
+
+
+
+package com.jpmc.training.sparkcore;
+
+import java.util.List;
+
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
+RDDCreationTest
+public class 1 {
+	public static void main(String[] args) {
+		SparkConf conf=new SparkConf();
+		conf.setMaster("local[*]");
+		conf.setAppName("rdd-create-app");
+		JavaSparkContext sc=new JavaSparkContext(conf);
+		
+		JavaRDD<String> rdd1=sc.textFile("c:/test/sample.txt");
+		List<String> list= rdd1.collect();
+		list.forEach(System.out::println);
+	}
+
+}
+
+
+
+
+scala> val array=Array(10,40,60,12,45)
+
+
+scala> val rdd2=sc.parallelize(array)
+rdd2: org.apache.spark.rdd.RDD[Int] = ParallelCollectionRDD[4] at parallelize at <console>:26
+
+scala> rdd2.collect()
+
+
+scala> rdd2.collect().foreach(println)
+
+
+
+package com.jpmc.training.sparkcore;
+
+import java.util.Arrays;
+import java.util.List;
+
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
+
+public class RDDCreationTest2 {
+	public static void main(String[] args) {
+		SparkConf conf=new SparkConf();
+		conf.setMaster("local[*]");
+		conf.setAppName("rdd-create-app");
+		JavaSparkContext sc=new JavaSparkContext(conf);
+		List<Integer> list=Arrays.asList(12,55,22,8,10,28);
+		
+		JavaRDD<Integer> rdd1=sc.parallelize(list);
+		rdd1.collect().forEach(System.out::println);
+	}
+
+}
+
+
+scala> rdd2.take(3)
+res9: Array[Int] = Array(10, 40, 60)
+
+scala> rdd1.collect()
+res10: Array[String] = Array(This is a test file, Spark is fun, Scala is interesting)
+
+scala> rdd1.getNumPartitions
+res11: Int = 2
+
+scala> rdd1.collect
+res12: Array[String] = Array(This is a test file, Spark is fun, Scala is interesting)
+
+scala> rdd1.saveAsTextFile("c:/testout")
+
+scala> val rdd1=sc.textFile("c:/test/sample.txt",4)
+rdd1: org.apache.spark.rdd.RDD[String] = c:/test/sample.txt MapPartitionsRDD[9] at textFile at <console>:24
+
+scala> rdd1.getNumPartitions
+
+
+scala> val array=Array(10,40,60,12,45)
+array: Array[Int] = Array(10, 40, 60, 12, 45)
+
+scala> val rdd2=sc.parallelize(array)
+rdd2: org.apache.spark.rdd.RDD[Int] = ParallelCollectionRDD[10] at parallelize at <console>:26
+
+scala> val rdd3=rdd2.map(n=>n*2)
+rdd3: org.apache.spark.rdd.RDD[Int] = MapPartitionsRDD[11] at map at <console>:25
+
+scala> rdd2.collect
+res15: Array[Int] = Array(10, 40, 60, 12, 45)
+
+scala> rdd3.collect
+res16: Array[Int] = Array(20, 80, 120, 24, 90)'
+
+
+
+scala> val rdd4=rdd2.map(n=>"value is "+n)
+rdd4: org.apache.spark.rdd.RDD[String] = MapPartitionsRDD[12] at map at <console>:25
+
+scala> rdd4.collect
+
+scala> val rdd3=rdd2.filter(n=>n>30)
+rdd3: org.apache.spark.rdd.RDD[Int] = MapPartitionsRDD[13] at filter at <console>:25
+
+scala> rdd3.collect
+
+scala> rdd2.map(a=>a*5).filter(a=>a<100).collect
+
+
+
+package com.jpmc.training.sparkcore;
+
+import java.util.Arrays;
+import java.util.List;
+
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
+
+public class TransformationTest {
+	public static void main(String[] args) {
+		SparkConf conf=new SparkConf();
+		conf.setMaster("local[*]");
+		conf.setAppName("transformation-test-app");
+		JavaSparkContext sc=new JavaSparkContext(conf);
+		List<Integer> list=Arrays.asList(12,55,22,8,10,28);
+		
+		JavaRDD<Integer> rdd1=sc.parallelize(list);
+		rdd1.map(n->n*5).filter(n->n>=100).collect().forEach(System.out::println);
+	}
+
+}
+
+
+
+scala> var arr=Array(2,6,10,7)
+arr: Array[Int] = Array(2, 6, 10, 7)
+
+scala> val rdd=sc.parallelize(arr)
+rdd: org.apache.spark.rdd.RDD[Int] = ParallelCollectionRDD[16] at parallelize at <console>:26
+
+scala> rdd.map(n=>Array(n-1,n,n+1)).collect
+res22: Array[Array[Int]] = Array(Array(1, 2, 3), Array(5, 6, 7), Array(9, 10, 11), Array(6, 7, 8))
+
+scala> rdd.flatMap(n=>Array(n-1,n,n+1)).collect
+res23: Array[Int] = Array(1, 2, 3, 5, 6, 7, 9, 10, 11, 6, 7, 8)
+
+scala> val rdd1=rdd.map(n=>Array(n-1,n,n+1))
+rdd1: org.apache.spark.rdd.RDD[Array[Int]] = MapPartitionsRDD[19] at map at <console>:25
+
+scala> val rdd2=rdd.flatMap(n=>Array(n-1,n,n+1))
+rdd2: org.apache.spark.rdd.RDD[Int] = MapPartitionsRDD[20] at flatMap at <console>:25
+
+scala> rdd1.collect
+res24: Array[Array[Int]] = Array(Array(1, 2, 3), Array(5, 6, 7), Array(9, 10, 11), Array(6, 7, 8))
+
+scala> rdd2.collect
+res25: Array[Int] = Array(1, 2, 3, 5, 6, 7, 9, 10, 11, 6, 7, 8)
+
+
+package com.jpmc.training.sparkcore;
+
+import java.util.Arrays;
+import java.util.List;
+
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
+
+public class FlatMapTest {
+	public static void main(String[] args) {
+		SparkConf conf=new SparkConf();
+		conf.setMaster("local[*]");
+		conf.setAppName("transformation-test-app");
+		JavaSparkContext sc=new JavaSparkContext(conf);
+		
+		
+		JavaRDD<String> rdd1=sc.textFile("c:/test/sample.txt");
+		JavaRDD<String> wordsRdd=rdd1.flatMap(line->Arrays.asList(line.split(" ")).iterator());
+		wordsRdd.collect().forEach(System.out::println);
+				
+	}
+
+}
+
+
+ sc.textFile("c:/test/sample.txt").flatMap(line=>line.split(" ")).collect()
+
+
+sc.setLogLevel("WARN");
+
+
+
+scala> val t=(23,55,12.444,"hello")
+t: (Int, Int, Double, String) = (23,55,12.444,hello)
+
+scala> t._1
+res27: Int = 23
+
+scala> t._2
+res28: Int = 55
+
+scala> t._4
+
+
+
+scala> val rdd1=sc.parallelize(Array(("a",2),("b",3),("a",6),("c",10),("b",3)))
+rdd1: org.apache.spark.rdd.RDD[(String, Int)] = ParallelCollectionRDD[24] at parallelize at <console>:24
+
+scala> val rdd2=rdd1.groupByKey()
+rdd2: org.apache.spark.rdd.RDD[(String, Iterable[Int])] = ShuffledRDD[25] at groupByKey at <console>:25
+
+scala> rdd2.collect()
+
+
+val rdd2=rdd1.countByKey()
+
+
+scala> val rdd1=sc.parallelize(Array(("a",2),("b",4),("a",6),("c",10),("b",3)))
+rdd1: org.apache.spark.rdd.RDD[(String, Int)] = ParallelCollectionRDD[28] at parallelize at <console>:24
+
+scala> val rdd2=rdd1.reduceByKey((x,y)=>x+y)
+rdd2: org.apache.spark.rdd.RDD[(String, Int)] = ShuffledRDD[29] at reduceByKey at <console>:25
+
+scala> rdd2.collect
+
+
+scala> val rdd1=sc.parallelize(Array(("a",5),("b",4),("c",8),("a",3),("d",7),("b",4),("a",7),("b",3),("b",1)))
+rdd1: org.apache.spark.rdd.RDD[(String, Int)] = ParallelCollectionRDD[30] at parallelize at <console>:24
+
+scala> val rdd2=rdd1.reduceByKey((x,y)=>x+y)
+rdd2: org.apache.spark.rdd.RDD[(String, Int)] = ShuffledRDD[31] at reduceByKey at <console>:25
+
+scala> rdd2.collect()
+
+
+
+package com.jpmc.training.sparkcore;
+
+import java.util.Arrays;
+import java.util.List;
+
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
+
+import scala.Tuple2;
+
+public class PairRddTest {
+	public static void main(String[] args) {
+		SparkConf conf=new SparkConf();
+		conf.setMaster("local[*]");
+		conf.setAppName("transformation-test-app");
+		JavaSparkContext sc=new JavaSparkContext(conf);
+		sc.setLogLevel("WARN");
+		
+		List<Tuple2<String, Integer>> list=Arrays.asList(new Tuple2<>("a", 2),new Tuple2<>("a", 2),
+				new Tuple2<>("b", 3),new Tuple2<>("a", 3));
+		JavaPairRDD<String,Integer> rdd1=sc.parallelizePairs(list);
+		rdd1.reduceByKey((x,y)->x+y).collect().forEach(System.out::println);
+		
+				
+	}
+
+}
+
+--------------------------------------------------------------------------------------------
+
+Day 2 :
+
+user001	John Fedrick
+user234	Ramesh Sharma
+user233	Deepak Shetty
+
+
+
+ sc.textFile("c:/test/users.txt").map(line=>line.split("\t")).map(arr=>(arr(0),arr(1))).collect().foreach(println)
+
+package com.jpmc.training.sparkcore;
+
+import java.util.Arrays;
+import java.util.List;
+
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
+
+import scala.Tuple2;
+
+public class PairRddTest2 {
+	public static void main(String[] args) {
+		SparkConf conf=new SparkConf();
+		conf.setMaster("local[*]");
+		conf.setAppName("transformation-test-app");
+		JavaSparkContext sc=new JavaSparkContext(conf);
+		sc.setLogLevel("WARN");
+		
+		JavaRDD<String> rdd1=sc.textFile("c:/test/users.txt");
+		rdd1.map(line->line.split("\t")).map(arr->new Tuple2<>(arr[0], arr[1])).collect().
+		forEach(System.out::println);
+				
+	}
+
+}
+
+
+the cat sat on the mat
+the aardwark sat on the sofa
+
+scala> val rdd1=sc.textFile("c:/test/words.txt")
+rdd1: org.apache.spark.rdd.RDD[String] = c:/test/words.txt MapPartitionsRDD[41] at textFile at <console>:24
+
+scala> rdd1.collect
+res37: Array[String] = Array(the cat sat on the mat, the aardwark sat on the sofa)
+
+scala> val rdd2=rdd1.flatMap(line=>line.split(" "))
+rdd2: org.apache.spark.rdd.RDD[String] = MapPartitionsRDD[42] at flatMap at <console>:25
+
+scala> rdd2.collect
+
+
+scala> val rdd3=rdd2.map(word=>(word,1))
+rdd3: org.apache.spark.rdd.RDD[(String, Int)] = MapPartitionsRDD[43] at map at <console>:25
+
+scala> rdd3.collect
+res39: Array[(String, Int)] = Array((the,1), (cat,1), (sat,1), (on,1), (the,1), (mat,1), (the,1), (aardwark,1), (sat,1), (on,1), (the,1), (sofa,1))
+
+scala> val rdd4=rdd3.reduceByKey((x,y)=>x+y)
+rdd4: org.apache.spark.rdd.RDD[(String, Int)] = ShuffledRDD[44] at reduceByKey at <console>:25
+
+scala> rdd4.collect
+
+
+
+
+package com.jpmc.training.sparkcore;
+
+import java.util.Arrays;
+
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
+
+import scala.Tuple2;
+
+public class WordCountTest {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+
+		SparkConf conf=new SparkConf();
+		conf.setMaster("local[*]");
+		conf.setAppName("transformation-test-app");
+		JavaSparkContext sc=new JavaSparkContext(conf);
+		sc.setLogLevel("WARN");
+		
+		JavaRDD<String> rdd1=sc.textFile("c:/test/words.txt");
+		rdd1.flatMap(line->Arrays.asList(line.split(" ")).iterator())
+		.mapToPair(word->new Tuple2<>(word,1)).reduceByKey((x,y)->x+y).collect().
+		forEach(System.out::println);
+		
+	}
+
+}
+
+
+
+
+c:\test\users.json
+
+{"name":"Alice", "pcode":"94304"}
+{"name":"Brayden", "age":30, "pcode":"94304"}
+{"name":"Carla", "age":19, "pcode":"10036"}
+{"name":"Diana", "age":46}
+{"name":"Étienne", "pcode":"94104"}
+
+
+scala> val df=spark.read.json("c:/test/users.json")
+df: org.apache.spark.sql.DataFrame = [age: bigint, name: string ... 1 more field]
+
+scala> df.show()
+
+scala> val rdd=df.rdd
+rdd: org.apache.spark.rdd.RDD[org.apache.spark.sql.Row] = MapPartitionsRDD[60] at rdd at <console>:25
+
+scala> rdd.collect
+
+
+scala> case class Emp(id:Int,name:String)
+defined class Emp
+
+scala> val rdd1=sc.parallelize(Array(Emp(101,"Deva"),Emp(121,"Arvind")) )
+
+
+val df1=rdd1.toDF
+
+df1.show()
+
+
+c:\test\employee.csv
+
+id,name,designation
+1001,Suresh,Developer
+1002,Deva,Accountant
+1003,Surya,Architect
+1004,Ramesh,Developer
+
+
+
+scala> val empDF=spark.read.csv("c:/test/employee.csv")
+empDF: org.apache.spark.sql.DataFrame = [_c0: string, _c1: string ... 1 more field]
+
+scala> empDF.show
+
+val df=spark.read.format("csv").option("header",true).load("c:/test/employee.csv")
+
+
+
+ df1.write.format("csv").option("header",true).save("c:/testcsv2")
+
+
+
+ df1.write.save("c:/testparquet")
+
+
+scala> val df2=spark.read.format("parquet").load("c:/testparquet")
+df2: org.apache.spark.sql.DataFrame = [age: bigint, name: string ... 1 more field]
+
+scala> df2.show
+
+:q---------------to exit the spark shell
+
+spark-shell --packages org.apache.spark:spark-avro_2.12:3.0.3
+
+scala> val df=spark.read.format("csv").option("header",true).load("c:/test/employee.csv")
+df: org.apache.spark.sql.DataFrame = [id: string, name: string ... 1 more field]
+
+scala> df.show
+
+df.write.format("avro").save("c:/testavro")
+
+
+
+<dependencies>
+  <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-sql -->
+<dependency>
+    <groupId>org.apache.spark</groupId>
+    <artifactId>spark-sql_2.12</artifactId>
+    <version>3.0.3</version>
+   </dependency>
+  
+  </dependencies>
+
+
+
+
+scala> val df1=spark.read.format("avro").load("c:/testavro")
+df1: org.apache.spark.sql.DataFrame = [id: string, name: string ... 1 more field]
+
+scala> df1.show()
+
+
+
+
+package com.jpmc.training.sparksql;
+
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SparkSession;
+
+public class DataFrameTest {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		
+		SparkSession spark=SparkSession.builder().appName("dataframe-app")
+				                .master("local[*]").getOrCreate();
+		
+		spark.sparkContext().setLogLevel("WARN");
+		
+		Dataset<Row> ds=spark.read().format("csv").option("header", true)
+				.load("c:/test/employee.csv");
+		ds.show();
+				
+
+	}
+
+}
+
+
+
+
+ <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-avro -->
+<dependency>
+    <groupId>org.apache.spark</groupId>
+    <artifactId>spark-avro_2.12</artifactId>
+    <version>3.0.3</version>
+</dependency>
+
+
+
+package com.jpmc.training.sparksql;
+
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SparkSession;
+
+public class AvroDataFrameTest {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		
+		SparkSession spark=SparkSession.builder().appName("dataframe-app")
+				                .master("local[*]").getOrCreate();
+		
+		spark.sparkContext().setLogLevel("WARN");
+		
+		Dataset<Row> ds=spark.read().format("avro").option("header", true)
+				.load("c:/testavro");
+		ds.show();
+				
+
+	}
+
+}
+
+
+mysql> create database trainingdb;
+Query OK, 1 row affected (0.00 sec)
+
+mysql> use trainingdb;
+Database changed
+mysql> create table employee(id integer,name varchar(20),designation varchar(20));
+Query OK, 0 rows affected (0.06 sec)
+
+mysql> insert into employee values(1001,"Ravi","Developer");
+Query OK, 1 row affected (0.02 sec)
+
+mysql> insert into employee values(1002,"Deva","Architect");
+Query OK, 1 row affected (0.00 sec)
+
+mysql> insert into employee values(1003,"Suresh","Accountant");
+Query OK, 1 row affected (0.00 sec)
+
+select * from employee;
+
+
+https://downloads.mysql.com/archives/get/p/3/file/mysql-connector-java-5.1.49.zip
+
+spark-shell  --driver-class-path c:\driver\mysql-connector-java-5.1.49.jar
+
+val jdbcDF=spark.read.format("jdbc").option("url","jdbc:mysql://localhost:3306/trainingdb").option("dbtable","employee").option("user","root").option("password","Password@1").load()
+
+dbcDF.show
+
+scala> import org.apache.spark.sql.types._
+import org.apache.spark.sql.types._
+
+scala> val list=List(StructField("empid",IntegerType),StructField("empname",StringType),StructField("designation",StringTy
+pe))
+list: List[org.apache.spark.sql.types.StructField] = List(StructField(empid,IntegerType,true), StructField(empname,StringType,true), StructField(designation,StringType,true))
+
+scala> val empSchema=StructType(list)
+empSchema: org.apache.spark.sql.types.StructType = StructType(StructField(empid,IntegerType,true), StructField(empname,StringType,true), StructField(designation,StringType,true))
+
+scala> val df=spark.read.format("csv").option("header",true).schema(empSchema).load("c:/test/employee.csv")
+df: org.apache.spark.sql.DataFrame = [empid: int, empname: string ... 1 more field]
+
+scala> df.show
+
+ df.groupBy("designation").count().show
+
+
+c:\test\people.csv
+
+pcode,lastName,firstName,age
+02134,Hopper,Grace,52
+,Turing,Alan,32
+94020,Lovelace,Ada,28
+87501,Babbage,Charles,49
+02134,Wirth,Niklaus,48
+
+c:\test\postalcodes.csv
+
+pcode,city,state
+02134,Boston,MA
+94020,Palo Alto,CA
+87501,Santa Fe,NM
+60645,Chicago,IL
+
+val peopleDF=spark.read.format("csv").option("header",true).load("c:/test/people.csv")
+
+
+scala> peopleDF.show
+
+
+
+scala> val postalcodesDF=spark.read.format("csv").option("header",true).load("c:/test/postalcodes.csv")
+
+
+scala> val joinDF=peopleDF.join(postalcodesDF,"pcode")
+joinDF: org.apache.spark.sql.DataFrame = [pcode: string, lastName: string ... 4 more fields]
+
+scala> joinDF.show
+
+
+scala> peopleDF.join(postalcodesDF,peopleDF("pcode")===postalcodesDF("pcode"),"left_outer").show
+
+
+
+scala> peopleDF.join(postalcodesDF,peopleDF("pcode")===postalcodesDF("pcode"),"right_outer").show
+
+
+ peopleDF.join(postalcodesDF,peopleDF("pcode")===postalcodesDF("pcode"),"outer").show
+
+peopleDF.where($"pcode".isNotNull).show
+
+df.select(($"empid"*2).alias("new_id"),$"empname",$"designation").show
+
+scala> df.createTempView("emp")
+
+scala> spark.sql("select * from emp").show
+
+scala> spark.sql("select empid,empname from emp where designation='Developer'").show
+---------------------------------------------------------------------------------------------------------------------------------------
+
+Day 3:
+
+
+
+ <dependencies>
+  <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-streaming -->
+<dependency>
+    <groupId>org.apache.spark</groupId>
+    <artifactId>spark-streaming_2.12</artifactId>
+    <version>3.0.3</version>
+    
+</dependency>
+  
+  </dependencies>
+
+
+
+package com.jpmc.training.sparkstreams;
+
+import java.util.Arrays;
+
+import org.apache.spark.SparkConf;
+import org.apache.spark.streaming.Durations;
+import org.apache.spark.streaming.api.java.JavaDStream;
+import org.apache.spark.streaming.api.java.JavaStreamingContext;
+
+import scala.Tuple2;
+
+public class WordCountStreamTest {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		SparkConf conf=new SparkConf();
+		conf.setMaster("local[*]");
+		conf.setAppName("wordcount-stream-app");
+		JavaStreamingContext streamingContext=new JavaStreamingContext(conf,Durations.seconds(20));
+		JavaDStream<String> dStream=streamingContext.textFileStream("c:/teststream/test");
+		dStream.flatMap(line->Arrays.asList(line.split(" ")).iterator()).
+		mapToPair(word->new Tuple2<>(word, 1)).reduceByKey((x,y)->x+y).print();
+		streamingContext.start();
+		
+		System.out.println("streaming started");
+		
+		try {
+			streamingContext.awaitTermination();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+
+}
+
+
+https://archive.apache.org/dist/kafka/2.5.0/kafka_2.12-2.5.0.tgz
+
+
+
+<dependencies>
+  <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-streaming -->
+<dependency>
+    <groupId>org.apache.spark</groupId>
+    <artifactId>spark-streaming_2.12</artifactId>
+    <version>3.0.3</version>
+    
+</dependency>
+  <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-streaming-kafka-0-10 -->
+<dependency>
+    <groupId>org.apache.spark</groupId>
+    <artifactId>spark-streaming-kafka-0-10_2.12</artifactId>
+    <version>3.0.3</version>
+</dependency>
+  
+  </dependencies>
+
+bin\windows\zookeeper-server-start.bat config\zookeeper.properties
+
+
+bin\windows\kafka-server-start.bat config\server.properties
+
+bin\windows\kafka-topics --create --topic test-topic --partitions 4 --replication-factor 1 --zookeeper localhost:2181
+
+
+
+package com.jpmc.training.kafkastreams;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.common.serialization.StringDeserializer;
+import org.apache.spark.SparkConf;
+import org.apache.spark.streaming.Durations;
+import org.apache.spark.streaming.api.java.JavaInputDStream;
+import org.apache.spark.streaming.api.java.JavaStreamingContext;
+import org.apache.spark.streaming.kafka010.ConsumerStrategies;
+import org.apache.spark.streaming.kafka010.KafkaUtils;
+import org.apache.spark.streaming.kafka010.LocationStrategies;
+
+import scala.Tuple2;
+
+
+
+public class KafkaSparkStreamingApp {
+public static void main(String[] args) {
+	SparkConf conf=new SparkConf();
+	conf.setMaster("local[*]");
+	conf.setAppName("kafka-wordcount-stream-app");
+	JavaStreamingContext streamingContext=new JavaStreamingContext(conf,Durations.seconds(60));
+	streamingContext.sparkContext().setLogLevel("WARN");
+	
+	String topic="test-topic";
+	String kafkaUrl="localhost:9092";
+	
+	Map<String, Object> props=new HashMap<>();
+	props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaUrl);
+	props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+	props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+	props.put(ConsumerConfig.GROUP_ID_CONFIG,"group-1");
+	
+	Collection<String> topicList=Collections.singletonList(topic);
+	
+	JavaInputDStream<ConsumerRecord<String, String>> dStream=
+			KafkaUtils.createDirectStream(streamingContext, LocationStrategies.PreferConsistent(), 
+					ConsumerStrategies.Subscribe(topicList, props));
+	
+	dStream.mapToPair(msg->new Tuple2<>(msg.key(),msg.value())).map(t->t._2).
+			flatMap(line->Arrays.asList(line.split(" ")).iterator()).
+	mapToPair(word->new Tuple2<>(word, 1)).reduceByKey((x,y)->x+y).print();
+	streamingContext.start();
+	
+	System.out.println("streaming started");
+	
+	try {
+		streamingContext.awaitTermination();
+	} catch (InterruptedException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	
+	
+	
+}
+}
+
+
+bin\windows\kafka-console-producer --topic test-topic --bootstrap-server localhost:9092
+
+
+
+
+
+
+package com.jpmc.training.kafkastreams;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.common.serialization.StringDeserializer;
+import org.apache.spark.SparkConf;
+import org.apache.spark.streaming.Durations;
+import org.apache.spark.streaming.api.java.JavaInputDStream;
+import org.apache.spark.streaming.api.java.JavaStreamingContext;
+import org.apache.spark.streaming.kafka010.ConsumerStrategies;
+import org.apache.spark.streaming.kafka010.KafkaUtils;
+import org.apache.spark.streaming.kafka010.LocationStrategies;
+
+import scala.Tuple2;
+
+
+
+public class KafkaSparkStreamingApp {
+public static void main(String[] args) {
+	SparkConf conf=new SparkConf();
+	conf.setMaster("local[*]");
+	conf.setAppName("kafka-wordcount-stream-app");
+	JavaStreamingContext streamingContext=new JavaStreamingContext(conf,Durations.seconds(60));
+	streamingContext.sparkContext().setLogLevel("WARN");
+	
+	String topic="test-topic";
+	String kafkaUrl="localhost:9092";
+	
+	Map<String, Object> props=new HashMap<>();
+	props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaUrl);
+	props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+	props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+	props.put(ConsumerConfig.GROUP_ID_CONFIG,"group-1");
+	
+	Collection<String> topicList=Collections.singletonList(topic);
+	
+	JavaInputDStream<ConsumerRecord<String, String>> dStream=
+			KafkaUtils.createDirectStream(streamingContext, LocationStrategies.PreferConsistent(), 
+					ConsumerStrategies.Subscribe(topicList, props));
+	
+	dStream.mapToPair(msg->new Tuple2<>(msg.key(),msg.value())).map(t->t._2).
+			flatMap(line->Arrays.asList(line.split(" ")).iterator()).
+	mapToPair(word->new Tuple2<>(word, 1)).reduceByKey((x,y)->x+y)
+	.dstream().saveAsTextFiles("c:/wordcount/", "-fromkafka");
+	streamingContext.start();
+	
+	System.out.println("streaming started");
+	
+	try {
+		streamingContext.awaitTermination();
+	} catch (InterruptedException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	
+
+
+	
+	
+}
+}
+
+
+
+
+ <dependencies>
+  <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-sql -->
+<dependency>
+    <groupId>org.apache.spark</groupId>
+    <artifactId>spark-sql_2.12</artifactId>
+    <version>3.0.3</version>
+   </dependency>
+   </dependencies>
+
+
+
+package com.jpmc.training.structuredstreams;
+
+import org.apache.spark.sql.types.DataTypes;
+import org.apache.spark.sql.types.Metadata;
+import org.apache.spark.sql.types.StructField;
+import org.apache.spark.sql.types.StructType;
+
+public class StrucuredStreamingUtility {
+	public static StructType employeeSchema()
+	{
+		return new StructType(new StructField[] {
+			new StructField("id", DataTypes.IntegerType, false, Metadata.empty()),
+			new StructField("name", DataTypes.StringType, false, Metadata.empty()),
+			new StructField("designation", DataTypes.StringType, false, Metadata.empty())
+		});
+	}
+
+}
+
+
+c:\structuredstreams\csv\first.csv
+
+1001,Rajiv,Developer
+2322,Deva,Architect
+
+
+
+package com.jpmc.training.structuredstreams;
+
+import java.util.concurrent.TimeoutException;
+
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.streaming.StreamingQuery;
+import org.apache.spark.sql.streaming.StreamingQueryException;
+import org.apache.spark.sql.streaming.Trigger;
+
+public class StructuredStreamCSVTest {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		SparkSession spark=SparkSession.builder().appName("structured-csv-stream-app")
+                .master("local[*]").getOrCreate();
+
+		spark.sparkContext().setLogLevel("WARN");
+		String inputDirectory="C:/structuredstreams/csv";
+		Dataset<Row> df=spark.readStream().schema(StrucuredStreamingUtility.employeeSchema())
+				.csv(inputDirectory);
+		try {
+			StreamingQuery query=df.writeStream().trigger(Trigger.ProcessingTime("1 minute"))
+					.format("console").start();
+			System.out.println("streaming started");
+			query.awaitTermination();
+		} catch (TimeoutException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (StreamingQueryException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+
+	}
+
+}
+
+----------------------------------------------------------------
+Day 4:
+
+Create a structured streaming app which reads json files from directory c:/structuredstreams/json,
+polls at this source directory every 1 minute and writes them to the console.
+
+
+package com.jpmc.training.structuredstreams;
+
+import java.util.concurrent.TimeoutException;
+
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.streaming.StreamingQuery;
+import org.apache.spark.sql.streaming.StreamingQueryException;
+import org.apache.spark.sql.streaming.Trigger;
+
+public class StructuredStreamJsonTest {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		SparkSession spark=SparkSession.builder().appName("structured-json-stream-app")
+                .master("local[*]").getOrCreate();
+
+		spark.sparkContext().setLogLevel("WARN");
+		String inputDirectory="C:/structuredstreams/json";
+		Dataset<Row> df=spark.readStream().schema(StrucuredStreamingUtility.employeeSchema())
+				.json(inputDirectory);
+		try {
+			StreamingQuery query=df.writeStream().trigger(Trigger.ProcessingTime("1 minute"))
+					.format("console").
+					option("checkpointLocation", "testchkpoint")
+					.start();
+			System.out.println("streaming started");
+			query.awaitTermination();
+		} catch (TimeoutException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (StreamingQueryException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+
+	}
+
+}
+
+
+
+package com.jpmc.training.structuredstreams;
+
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.streaming.StreamingQuery;
+import org.apache.spark.sql.streaming.StreamingQueryException;
+import org.apache.spark.sql.streaming.Trigger;
+
+public class StructuredStreamCSVToJsonETLTest {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		SparkSession spark=SparkSession.builder().appName("structured-csv-json-etl-app")
+                .master("local[*]").getOrCreate();
+
+		spark.sparkContext().setLogLevel("WARN");
+		String inputDirectory="C:/structuredstreams/csv";
+		Dataset<Row> df=spark.readStream().schema(StrucuredStreamingUtility.employeeSchema())
+				.csv(inputDirectory).where("designation='Developer'").select("id","name");
+				
+		try {
+			StreamingQuery query=df.writeStream().trigger(Trigger.ProcessingTime("1 minute"))
+					.format("json").
+					option("checkpointLocation", "testchkpointetl")
+					.start("c:/testoutputjson/developers");
+			System.out.println("streaming started");
+			query.awaitTermination();
+		} catch (StreamingQueryException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+
+	}
+
+}
+
+

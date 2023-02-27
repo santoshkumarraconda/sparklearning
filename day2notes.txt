@@ -1,0 +1,47 @@
+Map Reduce:
+
+Two phases:
+1. Map phase---------------------------Multiple transformations
+2. Reduce phase---------------------Single Transformation/Action
+
+dataframe--------------type checking done at runtime
+dataset------------------type checking done at compile time
+
+dataset is not supported by python.
+
+SparkContext is the entry point for Spark Core.
+SparkSession is the entry point for Spark Sql.
+
+The read function of SparkSession returns a DataFrameReader.
+
+The json function of DataFrameRader returns a DataFrame.
+
+
+Parquet:
+
+It is a columnar storage format. The data is stored in binary format. More efficient than csv and json.
+More commonly used when we select some specific columns and store them.
+
+The default format while read/write is parquet.
+
+df1.write.save("c:/testparquet") is equivalent to df1.write.format("parquet").save("c:/testparquet") 
+
+spark.read.format("parquet").load("c:/testparquet")  is equivalent to spark.read.load("c:/testparquet") 
+
+
+Avro:
+
+It is a row based storage format. It is also a binary format. 
+More efficient than json and csv.
+More commonly used when we store the entire row.
+
+Avro format is not by default supported by spark. we need to use external libraries to make it to work.
+
+
+JDBC---------------Java Database Connectivity--------------Api through which any java application can interact with an RDBMS.
+We need the jdbc driver provided by the database vendor in the classpath of the java application.
+
+In this case, the java application is spark.
+
+The jdbc driver for mysql can be downloaded from https://downloads.mysql.com/archives/get/p/3/file/mysql-connector-java-5.1.49.zip.
+

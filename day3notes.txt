@@ -1,0 +1,182 @@
+groupBy() on a dataframe returns a relational grouped data set.
+
+In spark sql, we can use sql statements similar to RDBMS.
+
+For this , register the dataframe as view using the following command.
+
+df.createTempView("empview")
+
+
+Then, the sql statements as shown below.
+
+spark.sql("select * from empview").show()
+
+
+Spark Streaming:
+
+Deals with live data.
+
+Two types:
+
+1. Streaming unstructured data------------------DStream(Discretized Stream)------------------built on rdds
+2. Streaming structured data----------------------Sql Stream-------------------------------------------built on data frames.
+
+DStream ------------Abstraction for sequence of RDDs represented as a continuous stream.
+
+	             Extract		Transform		Load
+Streaming Source------------------------->Streaming Application------------------------------>Sink
+(Kafka,Twitter)						           (File,DB,HDFS)	
+
+TextStream---------------------A directory---------------looks for each new file and processes the content of the file.
+
+
+Performing word count of contents available in new files getting added to the directory.
+
+
+Kafka is a very popular messaging server which can handle millions of messages at a time.
+
+	   Extract			Transform		Load	
+Kafka Topic---------------------------->Spark Streaming App----------------------------->File System
+
+steps:
+
+1. Download kafka from https://archive.apache.org/dist/kafka/2.5.0/kafka_2.12-2.5.0.tgz and extract to c:\.
+
+2.  Kafka uses a service called zookeeper to maintain the metadata. 
+Start the zookeeper.
+Open a new command , navigate to  c:\kafka_2.12-2.5.0 and run the following command.
+
+bin\windows\zookeeper-server-start.bat config\zookeeper.properties
+
+3. start the kafka server.
+
+Open a new command , navigate to  c:\kafka_2.12-2.5.0 and run the following command.
+
+bin\windows\kafka-server-start.bat config\server.properties
+
+4. create a kafka topic called test-topic.
+
+Open a new command , navigate to  c:\kafka_2.12-2.5.0 and run the following command.
+
+bin\windows\kafka-topics --create --topic test-topic --partitions 4 --replication-factor 1 --zookeeper localhost:2181
+
+
+Each kafka message has a key and value.
+In our example , both key and values are of string type.
+We need to configure the respective deserializers for key and value.
+
+5. create the streaming app.
+
+package com.jpmc.training.kafkastreams;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.common.serialization.StringDeserializer;
+import org.apache.spark.SparkConf;
+import org.apache.spark.streaming.Durations;
+import org.apache.spark.streaming.api.java.JavaInputDStream;
+import org.apache.spark.streaming.api.java.JavaStreamingContext;
+import org.apache.spark.streaming.kafka010.ConsumerStrategies;
+import org.apache.spark.streaming.kafka010.KafkaUtils;
+import org.apache.spark.streaming.kafka010.LocationStrategies;
+
+import scala.Tuple2;
+
+
+
+public class KafkaSparkStreamingApp {
+public static void main(String[] args) {
+	SparkConf conf=new SparkConf();
+	conf.setMaster("local[*]");
+	conf.setAppName("kafka-wordcount-stream-app");
+	JavaStreamingContext streamingContext=new JavaStreamingContext(conf,Durations.seconds(60));
+	streamingContext.sparkContext().setLogLevel("WARN");
+	
+	String topic="test-topic";
+	String kafkaUrl="localhost:9092";
+	
+	Map<String, Object> props=new HashMap<>();
+	props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaUrl);
+	props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+	props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+	props.put(ConsumerConfig.GROUP_ID_CONFIG,"group-1");
+	
+	Collection<String> topicList=Collections.singletonList(topic);
+	
+	JavaInputDStream<ConsumerRecord<String, String>> dStream=
+			KafkaUtils.createDirectStream(streamingContext, LocationStrategies.PreferConsistent(), 
+					ConsumerStrategies.Subscribe(topicList, props));
+	
+	dStream.mapToPair(msg->new Tuple2<>(msg.key(),msg.value())).map(t->t._2).
+			flatMap(line->Arrays.asList(line.split(" ")).iterator()).
+	mapToPair(word->new Tuple2<>(word, 1)).reduceByKey((x,y)->x+y).print();
+	streamingContext.start();
+	
+	System.out.println("streaming started");
+	
+	try {
+		streamingContext.awaitTermination();
+	} catch (InterruptedException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	
+	
+	
+}
+}
+
+
+
+
+6. start a kafka console producer to publish messages to the topic.
+
+bin\windows\kafka-console-producer --topic test-topic --bootstrap-server localhost:9092
+
+7. Run the spark streaming app
+
+
+kafka streaming vs spark streaming 
+
+kafka streaming processes the data in a single jvm.
+spark streaming processes the data parallely in multiple nodes.
+
+
+
+Structured Streaming:
+
+Structured Spark Streaming processes structured live data like csv,json,parquet,avro and etc.
+
+Structured Spark Streaming is built on data frames.
+
+
+It processes incrementally and updates the final results as more streaming data arrives.
+
+Streaming Query:
+
+Handle to a query that is executing continuously in the background as new data arrives.
+
+
+Create a structured streaming app which reads json files from directory c:/structuredstreams/json
+which polls at the source directory every 1 minute and writes them to the console.
+
+
+
+
+CheckPoint:
+
+CheckPoint is a directory used by streaming app to store the meta data of stream processing.
+During processing of a file , if the app crashes, it starts from the unprocessed record within that file.
+This information is kept within the checkpoint's data.
+This is configured the checkpointLocation property in the Streaming Query.
+
+
+
+

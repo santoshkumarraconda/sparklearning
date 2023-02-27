@@ -1,0 +1,165 @@
+
+package com.jpmc.training.structuredstreams;
+
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.streaming.StreamingQuery;
+import org.apache.spark.sql.streaming.StreamingQueryException;
+import org.apache.spark.sql.streaming.Trigger;
+
+public class StructuredStreamCSVToJsonETLTest {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		SparkSession spark=SparkSession.builder().appName("structured-csv-json-etl-app")
+                .master("local[*]").getOrCreate();
+
+		spark.sparkContext().setLogLevel("WARN");
+		String inputDirectory="C:/structuredstreams/csv";
+		Dataset<Row> df=spark.readStream().schema(StrucuredStreamingUtility.employeeSchema())
+				.csv(inputDirectory).where("designation='Developer'").select("id","name");
+				
+		try {
+			StreamingQuery query=df.writeStream().trigger(Trigger.ProcessingTime("1 minute"))
+					.format("json").
+					option("checkpointLocation", "testchkpointetl")
+					.start("c:/testoutputjson/developers");
+			System.out.println("streaming started");
+			query.awaitTermination();
+		} catch (StreamingQueryException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+
+	}
+
+}
+
+
+
+scala> val rdd1=sc.textFile("c:/test/sample.txt")
+rdd1: org.apache.spark.rdd.RDD[String] = c:/test/sample.txt MapPartitionsRDD[8] at textFile at <console>:24
+
+scala> rdd1.getNumPartitions
+
+
+
+scala> val rdd1=sc.textFile("c:/test/sample.txt")
+rdd1: org.apache.spark.rdd.RDD[String] = c:/test/sample.txt MapPartitionsRDD[8] at textFile at <console>:24
+
+scala> rdd1.getNumPartitions
+res2: Int = 2
+
+
+scala> val rdd2=rdd1.flatMap(line=>line.split(" "))
+rdd2: org.apache.spark.rdd.RDD[String] = MapPartitionsRDD[12] at flatMap at <console>:25
+
+
+
+scala> val rdd3=rdd2.map(x=>(x,1))
+rdd3: org.apache.spark.rdd.RDD[(String, Int)] = MapPartitionsRDD[13] at map at <console>:25
+
+scala> val rdd4=rdd3.reduceByKey((x,y)=>x+y)
+rdd4: org.apache.spark.rdd.RDD[(String, Int)] = ShuffledRDD[14] at reduceByKey at <console>:25
+
+rdd4.toDebugString
+
+scala> val rdd5=rdd4.repartition(1)
+rdd5: org.apache.spark.rdd.RDD[(String, Int)] = MapPartitionsRDD[18] at repartition at <console>:25
+
+scala> rdd5.getNumPartitions
+res5: Int = 1
+
+scala> rdd5.toDebugString
+
+
+ rdd5.collect()
+
+
+jar tvf Test.jar
+
+
+
+spark-submit --master local[*] --class com.jpmc.training.sparkcore.WordCountTest c:\jarfiles\Test.jar
+
+
+spark-class org.apache.spark.deploy.master.Master
+
+
+spark-class org.apache.spark.deploy.worker.Worker master-url
+spark-class org.apache.spark.deploy.worker.Worker master-url
+spark-class org.apache.spark.deploy.worker.Worker master-url
+
+
+
+spark-submit --master master-url --class com.jpmc.training.sparkcore.WordCountTest c:\jarfiles\Test.jar
+
+
+
+package com.jpmc.training.sparkcore;
+
+import java.util.Arrays;
+
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
+
+import scala.Tuple2;
+
+public class WordCountTest {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+
+		SparkConf conf=new SparkConf();
+		//conf.setMaster("local[*]");
+		conf.setAppName("transformation-test-app");
+		JavaSparkContext sc=new JavaSparkContext(conf);
+		sc.setLogLevel("WARN");
+		
+		JavaRDD<String> rdd1=sc.textFile("c:/test/words.txt");
+		rdd1.flatMap(line->Arrays.asList(line.split(" ")).iterator())
+		.mapToPair(word->new Tuple2<>(word,1)).reduceByKey((x,y)->x+y).collect().
+		forEach(System.out::println);
+		try {
+			Thread.sleep(10*60*1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+
+}
+
+
+spark-submit --conf "spark.serializer=org.apache.spark.serializer.KryoSerializer"
+ --master master-url --class class-name jar-file
+
+
+scala> case class Transaction(id:Long,custId:Int,itemId:Int)
+defined class Transaction
+
+scala> case class TransactionDetail(id:Long,custName:String,itemName:String)
+defined class TransactionDetail
+
+scala> val customerMap=Map(1->"Tom",2->"Harry")
+customerMap: scala.collection.immutable.Map[Int,String] = Map(1 -> Tom, 2 -> Harry)
+
+scala> val itemMap=Map(1->"Apple",2->"Orange")
+itemMap: scala.collection.immutable.Map[Int,String] = Map(1 -> Apple, 2 -> Orange)
+
+
+val transactions=sc.parallelize(List(Transaction(1,1,1),Transaction(2,1,2)))
+
+scala> val bcCustomerMap=sc.broadcast(customerMap)
+bcCustomerMap: org.apache.spark.broadcast.Broadcast[scala.collection.immutable.Map[Int,String]] = Broadcast(1)
+
+scala> val bcItemMap=sc.broadcast(itemMap)
+
+val transactionDetails=transactions.map(t=>TransactionDetail(t.id,bcCustomerMap.value(t.custId),bcItemMap.value(t.itemId)))
+
+ transactionDetails.collect
+

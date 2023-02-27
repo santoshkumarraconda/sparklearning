@@ -1,0 +1,208 @@
+
+	Extract		Transform		Load
+csv-------------------------->Spark Structured Streaming------------------------>json
+
+
+Worker:
+
+A worker provides CPU,memory and storage resources to a spark application. The workers run a spark application as distributed processes on a set
+of cluser nodes.
+
+Cluster Manager:
+
+Spark uses a cluster manager to acquire resources for executing a job in the cluster. It manages the computing resources across a cluster of nodes.
+The cluster manager process is also called the master process.
+
+Examples:
+Spark standalone cluster manager
+Apache Mesos
+Hadoop yarn
+
+
+Driver Program:
+
+A driver program is an application that uses spark as a library. It provides the data processing code that spark executes on the worker nodes.
+A java application which contains spark code is called a driver program.
+spark shell also acts as a driver program.
+
+Executor:
+
+An executor is a jvm that spark creates on each worker for an application.
+It executes the application code concurrently in multiple threads. 
+An executor has the same life span as the application for which it is created.
+
+jvm------java virtual machine------------interprets the java code and converts it to runtime instruction.
+any java code is run using JRE(Java Runtime Environment).
+JRE-------------------jvm+system libraries.
+
+
+Only after an action is requested, the data in the rdds are processed.
+
+Job:
+
+A job is a set of computations that spark performs to return results to the driver program. Each job contains one action and one or more transformations.
+
+
+
+Task:
+
+Task is the smallest unit of work that spark sends to an executor.
+Spark creates a tak per data partition.
+An executor runs one or more tasks concurrently.
+
+
+Partition:
+
+It is an atomic chunk of data.
+ie a logical division of data stored on a node over the cluster.
+
+RDD is a collection of partitions.
+
+Stage:
+A stage is a collection of tasks. Spark splits a job into DAG(Directed Acyclic Graph) of stages.
+
+A stage may depend on another stage.
+
+
+Shuffle:
+
+A shuffle redistributes data among a cluster of nodes. It is an expensive operation because it involves moving data across across a network.
+
+In a transformation , when there is a shuffle, it starts another stage because the data in the partitions have changed and separate set of tasks 
+have to be launched.
+
+
+spark-submit:
+	spark-submit is a command line tool used to execute a spark application.
+
+syntax:
+	spark-submit --master master-url --class class-name   jar-file (java/scala)
+
+
+	spark-submit --master master-url python-file
+
+
+
+
+Data Serialization----------can reduce the memory usage
+
+Formats that are slow to serialize objects into, or consume a large number of bytes will greatly slow down the computation.
+
+
+1. Java Serialization
+
+2. Kryo Serialization
+
+
+
+
+Java Serialization:
+
+Spark serializes objects which implement Serializable/Externalizable interfaces  automatically.
+
+Java Serialization is flexible but often quite slow and leads to large serialized formats of many classes.
+
+Kryo Serialization:
+
+Kryo Serialization serializes the objects more quickly.
+More compact than Java Serialization.
+
+You have to explicitly register your class with Kryo Serializer if it has to be serialized.
+
+To enable Kryo serialization,  while creating SparkConf object set the following property.
+
+conf.set("spark.serializer","org.apache.spark.serializer.KryoSerializer");
+
+conf.registerKryoClasses(new Class[]{MyClass1,MyClass2})
+
+
+spark-submit --conf "spark.serializer=org.apache.spark.serializer.KryoSerializer" --conf="spark.executor.memory=2g" 
+ --master master-url --class class-name jar-file
+
+make sure that executor memory size should not exceed more than 1/4th of ram size in each node.
+
+
+myconf.properties
+
+spark.serializer=org.apache.spark.serializer.KryoSerializer
+spark.executor.memory=2g
+
+
+spark-submit --properties-file myconf.properties
+
+
+JavaRDD<String> logs=sc.textFile("c:/webapp/logs");
+JavaRDD<String> errorLogs=logs.filter(line->line.contains("ERROR"));
+JavaRDD<String> warnLogs=logs.filter(line->line.contains("WARN"));
+int errCount=errorLogs.count();//flow ----------------------->opening the file,filtering out errors,count
+int warnCount=warnLogs.count();----------------------------->opening the file,filtering out warning,count
+
+
+
+
+cache:
+
+The cache method stores an RDD in the memory of the executors across a cluster. It essentially materializes an RDD in memory.
+
+JavaRDD<String> logs=sc.textFile("c:/webapp/logs");
+JavaRDD<String> errorAndWarns=logs.filter(line->line.contains("ERROR")||line.contains("WARN"))
+errorAndWarns.cache();
+JavaRDD<String> errorLogs=errorAndWarns.filter(line->line.contains("ERROR"));
+JavaRDD<String> warnLogs=lerrorAndWarns.filter(line->line.contains("WARN"));
+int errCount=errorLogs.count();//flow ----------------------->opening the file,filtering out errors and warns,cache it,filter out errors,count
+int warnCount=warnLogs.count();----------------------------->filtering out warning from cache,count
+
+A spark application will not crash if a node with cached RDD partitions fails. Spark automatically recreates and caches the partitions stored on
+the failed node on another node.
+
+
+
+Broadcast Variables:
+
+Broadcast variables enable a spark application to optimize sharing of data between the driver program and the tasks executing a job.
+
+Spark sends a broadcast variable to a worker node only once and caches it in deserialized form as a read only variable in the executor memory.
+
+
+
+scala> case class Transaction(id:Long,custId:Int,itemId:Int)
+defined class Transaction
+
+scala> case class TransactionDetail(id:Long,custName:String,itemName:String)
+defined class TransactionDetail
+
+scala> val customerMap=Map(1->"Tom",2->"Harry")
+customerMap: scala.collection.immutable.Map[Int,String] = Map(1 -> Tom, 2 -> Harry)
+
+scala> val itemMap=Map(1->"Apple",2->"Orange")
+itemMap: scala.collection.immutable.Map[Int,String] = Map(1 -> Apple, 2 -> Orange)
+
+
+val transactions=sc.parallelize(List(Transaction(1,1,1),Transaction(2,1,2)))
+
+scala> val bcCustomerMap=sc.broadcast(customerMap)
+bcCustomerMap: org.apache.spark.broadcast.Broadcast[scala.collection.immutable.Map[Int,String]] = Broadcast(1)
+
+scala> val bcItemMap=sc.broadcast(itemMap)
+
+val transactionDetails=transactions.map(t=>TransactionDetail(t.id,bcCustomerMap.value(t.custId),bcItemMap.value(t.itemId)))
+
+ transactionDetails.collect
+
+The use of broadcast variables enabled us to implement an efficient join between the customer,item and transaction dataset.
+We could have used the join operator from the RDD api , but that would have shuffled customer,item and transaction data over the network.
+Using broadcast variables, we instructed spark to send customer and item data to each node only once and replaced expensive join with
+simple map operation.
+
+
+
+periasamy.subramanian@gmail.com
+9880372634
+
+Learning Spark by Jules Damji ----------------------------------1
+Spark Definitive Guide by Bill Chambers----------------------2
+
+
+
+
+
